@@ -57,8 +57,32 @@ func NewProvider(ctx context.Context, cfg *config.Config) (LLMProvider, error) {
 // Primary: encoding/json into []string
 // Fallback: comma-split with whitespace trimming
 // Returns error only if fewer than 1 term is recovered
+// stripMarkdownFence removes ```json ... ``` or ``` ... ``` wrappers that some
+// LLMs add around JSON responses despite being asked not to.
+func stripMarkdownFence(s string) string {
+	s = strings.TrimSpace(s)
+	for _, prefix := range []string{"```json", "```"} {
+		if strings.HasPrefix(s, prefix) {
+			s = strings.TrimPrefix(s, prefix)
+			s = strings.TrimSuffix(s, "```")
+			return strings.TrimSpace(s)
+		}
+	}
+	return s
+}
+
 func parseTerms(raw string) ([]string, error) {
-	raw = strings.TrimSpace(raw)
+	raw = stripMarkdownFence(strings.TrimSpace(raw))
+
+	// Some LLMs return the JSON array wrapped in an outer JSON string
+	// (e.g. "\"[\\\"mac and cheese\\\", ...]\""  →  ["mac and cheese", ...]).
+	// Unwrap one level if the whole response is a JSON-encoded string.
+	if strings.HasPrefix(raw, "\"") {
+		var inner string
+		if json.Unmarshal([]byte(raw), &inner) == nil {
+			raw = strings.TrimSpace(inner)
+		}
+	}
 
 	// Primary: try JSON array parse
 	var terms []string

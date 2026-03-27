@@ -10,7 +10,7 @@ import (
 
 // GeminiProvider calls the Google Gemini API.
 // SDK: google.golang.org/genai
-// Model: gemini-2.0-flash
+// Model: gemini-2.5-flash
 type GeminiProvider struct {
 	client *genai.Client
 	model  string
@@ -25,7 +25,7 @@ func NewGeminiProvider(ctx context.Context, apiKey string) (*GeminiProvider, err
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Gemini client: %w", err)
 	}
-	return &GeminiProvider{client: client, model: "gemini-2.0-flash"}, nil
+	return &GeminiProvider{client: client, model: "gemini-2.5-flash"}, nil
 }
 
 // ProcessPrompt calls Gemini with a 10-second timeout.
@@ -36,7 +36,7 @@ func (p *GeminiProvider) ProcessPrompt(ctx context.Context, prompt string) ([]st
 
 	result, err := p.client.Models.GenerateContent(ctx, p.model, genai.Text(prompt), &genai.GenerateContentConfig{
 		SystemInstruction: genai.NewContentFromText(systemPrompt, genai.RoleModel),
-		MaxOutputTokens:   256,
+		MaxOutputTokens:   1024,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("Failed to interpret your prompt — please try again: %w", err)
