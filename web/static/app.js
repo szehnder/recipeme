@@ -99,6 +99,9 @@ function dismissTile(recipeId) {
   const tile = document.querySelector(`[data-id="${recipeId}"]`);
   if (!tile) return;
 
+  // Mark as seen immediately to prevent race condition with fetchMore
+  state.seenIds.add(recipeId);
+
   // Capture current height before CSS collapses it
   const currentHeight = tile.offsetHeight;
   tile.style.height = currentHeight + "px";
@@ -113,7 +116,6 @@ function dismissTile(recipeId) {
     } else {
       tile.remove();
     }
-    state.seenIds.add(recipeId);
   }, { once: true });
 
   if (state.buffer.length < 5 && !state.loading) {
@@ -252,6 +254,9 @@ function showSuccessOverlay(filePath, recipes) {
   });
 
   overlay.classList.remove("hidden");
+
+  // Close overlay on click (single-use listener)
+  overlay.addEventListener('click', () => overlay.classList.add('hidden'), { once: true });
 }
 
 // ── Initial Load ──────────────────────────────────────────────────────────────
