@@ -35,7 +35,7 @@ func (p *GeminiProvider) ProcessPrompt(ctx context.Context, prompt string) ([]st
 	defer cancel()
 
 	result, err := p.client.Models.GenerateContent(ctx, p.model, genai.Text(prompt), &genai.GenerateContentConfig{
-		SystemInstruction: genai.NewContentFromText(systemPrompt, genai.RoleUser),
+		SystemInstruction: genai.NewContentFromText(systemPrompt, genai.RoleModel),
 		MaxOutputTokens:   256,
 	})
 	if err != nil {

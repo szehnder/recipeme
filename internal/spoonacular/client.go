@@ -13,16 +13,16 @@ import (
 
 // Recipe represents a recipe returned from the Spoonacular API.
 type Recipe struct {
-	ID               int
-	Title            string
-	Image            string
-	ReadyInMinutes   int
-	Servings         int
-	SourceURL        string
-	Summary          string
-	Cuisines         []string
-	Diets            []string
-	SpoonacularScore float64
+	ID               int      `json:"id"`
+	Title            string   `json:"title"`
+	Image            string   `json:"image"`
+	ReadyInMinutes   int      `json:"readyInMinutes"`
+	Servings         int      `json:"servings"`
+	SourceURL        string   `json:"sourceUrl"`
+	Summary          string   `json:"summary"`
+	Cuisines         []string `json:"cuisines"`
+	Diets            []string `json:"diets"`
+	SpoonacularScore float64  `json:"spoonacularScore"`
 }
 
 // apiRecipe is the raw JSON shape returned by Spoonacular.
