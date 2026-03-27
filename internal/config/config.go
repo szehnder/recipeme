@@ -49,7 +49,7 @@ func LoadConfig() (*Config, error) {
 	cfg.AnthropicKey = os.Getenv("ANTHROPIC_API_KEY")
 	cfg.GeminiKey = os.Getenv("GEMINI_API_KEY")
 	cfg.LLMProvider = os.Getenv("RECIPEME_LLM_PROVIDER")
-	cfg.NoBrowser = os.Getenv("RECIPEME_NO_BROWSER") == "1"
+	noBrowserEnv := os.Getenv("RECIPEME_NO_BROWSER") == "1"
 
 	// Load VaultPath from env (can be overridden by flag)
 	if vaultEnv := os.Getenv("RECIPEME_VAULT_PATH"); vaultEnv != "" {
@@ -63,9 +63,11 @@ func LoadConfig() (*Config, error) {
 
 	// Load Port from env (can be overridden by flag)
 	if portEnv := os.Getenv("RECIPEME_PORT"); portEnv != "" {
-		if p, err := strconv.Atoi(portEnv); err == nil {
-			cfg.Port = p
+		p, err := strconv.Atoi(portEnv)
+		if err != nil {
+			return nil, fmt.Errorf("invalid RECIPEME_PORT %q: %w", portEnv, err)
 		}
+		cfg.Port = p
 	}
 
 	// Override Port with flag if provided
@@ -73,9 +75,17 @@ func LoadConfig() (*Config, error) {
 		cfg.Port = port
 	}
 
-	// Override NoBrowser with flag if provided
-	if noBrowser {
-		cfg.NoBrowser = true
+	// Override NoBrowser with flag if provided (only if flag was explicitly set)
+	flagSet := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == "no-browser" {
+			flagSet = true
+		}
+	})
+	if flagSet {
+		cfg.NoBrowser = noBrowser
+	} else {
+		cfg.NoBrowser = noBrowserEnv
 	}
 
 	// Validate required fields

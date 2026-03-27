@@ -1,6 +1,6 @@
 module github.com/szehnder/recipeme
 
-go 1.22
+go 1.22.0
 
 require (
 	github.com/anthropics/anthropic-sdk-go v1.27.1

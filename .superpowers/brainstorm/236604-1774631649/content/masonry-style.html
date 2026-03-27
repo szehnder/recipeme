@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RecipeMe — Masonry Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f5f4f0; font-family: 'Georgia', serif; }
+
+  .header {
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header h1 { font-size: 18px; font-weight: 400; letter-spacing: 3px; text-transform: uppercase; color: #111; }
+  .header .query { font-size: 13px; color: #888; letter-spacing: 0.5px; }
+  .header .saved { font-size: 13px; color: #111; border-bottom: 1px solid #111; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
+
+  .masonry {
+    column-count: 4;
+    column-gap: 3px;
+    padding: 3px;
+  }
+
+  .tile {
+    break-inside: avoid;
+    position: relative;
+    margin-bottom: 3px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #ddd;
+  }
+
+  .tile img {
+    width: 100%;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .tile:hover img { transform: scale(1.03); }
+
+  /* Overlay — visible on hover */
+  .tile .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 14px;
+  }
+  .tile:hover .overlay { opacity: 1; }
+
+  .tile .title {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .tile .actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tile .btn-up, .tile .btn-down {
+    width: 32px; height: 32px;
+    border: 1px solid rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+    backdrop-filter: blur(4px);
+  }
+  .tile .btn-up:hover { background: rgba(74, 222, 128, 0.6); border-color: #4ade80; }
+  .tile .btn-down:hover { background: rgba(248, 113, 113, 0.6); border-color: #f87171; }
+
+  /* Voted states */
+  .tile.voted-up { outline: 2px solid #22c55e; }
+  .tile.voted-up .overlay { opacity: 1; background: linear-gradient(to top, rgba(0,50,0,0.65) 0%, transparent 70%); }
+  .tile.voted-up .btn-up { background: #22c55e; border-color: #22c55e; }
+
+  /* Always-visible title on small tiles */
+  .tile .always-title {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.6));
+    color: #fff;
+    font-size: 11px;
+    padding: 20px 10px 8px;
+    letter-spacing: 0.3px;
+    pointer-events: none;
+  }
+
+  /* Tall feature tile */
+  .tile.tall .placeholder { height: 380px; background: linear-gradient(160deg, #c9b99a, #a07850); }
+  .tile.med .placeholder  { height: 240px; background: linear-gradient(160deg, #b5c4a8, #7a9468); }
+  .tile.short .placeholder { height: 180px; background: linear-gradient(160deg, #c4b5a8, #9a7a68); }
+  .tile.sq .placeholder   { height: 210px; background: linear-gradient(160deg, #a8bcc4, #688a9a); }
+
+  .food-icon { position:absolute; top:50%; left:50%; transform:translate(-50%,-60%); font-size:52px; opacity:0.4; pointer-events:none; }
+
+  .footer {
+    padding: 20px 24px;
+    text-align: center;
+    font-size: 12px;
+    color: #aaa;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .footer span { border-bottom: 1px solid #aaa; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>RecipeMe</h1>
+  <div class="query">Searching: "quick pasta for kids"</div>
+  <div class="saved">3 Saved &rarr;</div>
+</div>
+
+<div class="masonry">
+
+  <div class="tile tall" id="t1">
+    <div class="placeholder"><span class="food-icon">🍝</span></div>
+    <div class="overlay">
+      <div class="title">Classic Spaghetti Carbonara</div>
+      <div class="actions">
+        <button class="btn-up" onclick="vote(event,'t1','up')">↑</button>
+        <button class="btn-down" onclick="vote(event,'t1','down')">↓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile short" id="t2">
+    <div class="placeholder"><span class="food-icon">🍕</span></div>
+    <div class="overlay">
+      <div class="title">Margherita Pizza</div>
+      <div class="actions">
+        <button class="btn-up" onclick="vote(event,'t2','up')">↑</button>
+        <button class="btn-down" onclick="vote(event,'t2','down')">↓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile med" id="t3">
+    <div class="placeholder"><span class="food-icon">🥗</span></div>
+    <div class="overlay">
+      <div class="title">Caesar Salad with Croutons</div>
+      <div class="actions">
+        <button class="btn-up" onclick="vote(event,'t3','up')">↑</button>
+        <button class="btn-down" onclick="vote(event,'t3','down')">↓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile sq" id="t4">
+    <div class="placeholder" style="background:linear-gradient(160deg,#c4a8b5,#9a6888)"><span class="food-icon">🍜</span></div>
+    <div class="overlay">
+      <div class="title">Chicken Ramen Bowl</div>
+      <div class="actions">
+        <button class="btn-up" onclick="vote(event,'t4','up')">↑</button>
+        <button class="btn-down" onclick="vote(event,'t4','down')">↓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile med" id="t5">
+    <div class="placeholder" style="background:linear-gradient(160deg,#c4c4a8,#9a9a68)"><span class="food-icon">🥞</span></div>
+    <div class="overlay">
+      <div class="title">Fluffy Buttermilk Pancakes</div>
+      <div class="actions">
+        <button class="btn-up" onclick="vote(event,'t5','up')">↑</button>
+        <button class="btn-down" onclick="vote(event,'t5','down')">↓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile tall" id="t6">
+    <div class="placeholder" style="background:linear-gradient(160deg,#a8b5c4,#688a9a)"><span class="food-icon">🌮</span></div>
+    <div class="overlay">
+      <div class="title">Crispy Fish Tacos</div>
+      <div class="actions">
+        <button class="btn-up" onclick="vote(event,'t6','up')">↑</button>
+        <button class="btn-down" onclick="vote(event,'t6','down')">↓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile short" id="t7">
+    <div class="placeholder" style="background:linear-gradient(160deg,#c4a8a8,#9a6868)"><span class="food-icon">🍔</span></div>
+    <div class="overlay">
+      <div class="title">Smash Burger</div>
+      <div class="actions">
+        <button class="btn-up" onclick="vote(event,'t7','up')">↑</button>
+        <button class="btn-down" onclick="vote(event,'t7','down')">↓</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tile sq" id="t8">
+    <div class="placeholder" style="background:linear-gradient(160deg,#b5c4a8,#7a9468)"><span class="food-icon">🍛</span></div>
+    <div class="overlay">
+      <div class="title">Mild Chicken Curry</div>
+      <div class="actions">
+        <button class="btn-up" onclick="vote(event,'t8','up')">↑</button>
+        <button class="btn-down" onclick="vote(event,'t8','down')">↓</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Showing 8 of 20 · <span>Load more</span>
+</div>
+
+<script>
+function vote(e, id, dir) {
+  e.stopPropagation();
+  const tile = document.getElementById(id);
+  tile.classList.remove('voted-up','voted-down');
+  if (dir === 'up') tile.classList.add('voted-up');
+  if (dir === 'down') { tile.style.opacity = '0.25'; tile.style.pointerEvents = 'none'; }
+}
+</script>
+</body>
+</html>
