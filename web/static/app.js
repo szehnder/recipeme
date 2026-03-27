@@ -15,14 +15,13 @@ const state = {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function updateBadge() {
-  const btn = document.getElementById("save-btn");
   const badge = document.getElementById("save-badge");
   const count = state.saved.size;
   badge.textContent = count;
   if (count === 0) {
-    btn.classList.add("hidden");
+    badge.classList.add("hidden");
   } else {
-    btn.classList.remove("hidden");
+    badge.classList.remove("hidden");
   }
 }
 
