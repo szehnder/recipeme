@@ -39,13 +39,13 @@ func (p *GeminiProvider) ProcessPrompt(ctx context.Context, prompt string) ([]st
 		MaxOutputTokens:   256,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Failed to interpret your prompt — please try again")
+		return nil, fmt.Errorf("Failed to interpret your prompt — please try again: %w", err)
 	}
 
 	raw := result.Text()
 	terms, err := parseTerms(raw)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to interpret your prompt — please try again")
+		return nil, fmt.Errorf("Failed to interpret your prompt — please try again: %w", err)
 	}
 	return terms, nil
 }

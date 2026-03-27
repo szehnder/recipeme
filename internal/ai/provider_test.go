@@ -63,6 +63,11 @@ func TestParseTerms(t *testing.T) {
 			wantTerms: []string{"mac and cheese", "pepperoni pizza", "spaghetti bolognese", "chicken alfredo", "grilled cheese"},
 			wantErr:   false,
 		},
+		{
+			name:    "empty JSON array returns error",
+			input:   "[]",
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {

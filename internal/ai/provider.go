@@ -63,14 +63,16 @@ func parseTerms(raw string) ([]string, error) {
 	// Primary: try JSON array parse
 	var terms []string
 	if err := json.Unmarshal([]byte(raw), &terms); err == nil {
-		if len(terms) >= 1 {
-			return terms, nil
+		// JSON parsed successfully
+		if len(terms) == 0 {
+			return nil, fmt.Errorf("LLM returned empty search terms")
 		}
+		return terms, nil
 	}
 
-	// Fallback: comma-split
+	// Fallback: comma-split (JSON unmarshal failed)
 	parts := strings.Split(raw, ",")
-	terms = terms[:0]
+	terms = []string{}
 	for _, p := range parts {
 		p = strings.TrimSpace(p)
 		if p != "" {

@@ -39,7 +39,7 @@ func (p *AnthropicProvider) ProcessPrompt(ctx context.Context, prompt string) ([
 		},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Failed to interpret your prompt — please try again")
+		return nil, fmt.Errorf("Failed to interpret your prompt — please try again: %w", err)
 	}
 
 	if len(msg.Content) == 0 {
@@ -49,7 +49,7 @@ func (p *AnthropicProvider) ProcessPrompt(ctx context.Context, prompt string) ([
 	raw := msg.Content[0].AsText().Text
 	terms, err := parseTerms(raw)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to interpret your prompt — please try again")
+		return nil, fmt.Errorf("Failed to interpret your prompt — please try again: %w", err)
 	}
 	return terms, nil
 }
