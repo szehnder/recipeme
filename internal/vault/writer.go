@@ -87,10 +87,26 @@ func truncateSummary(summary string, maxLen int) string {
 	return truncated + "..."
 }
 
-// WriteSession writes a session's recipes to an Obsidian-compatible markdown file.
+// Writer wraps the vault path and implements the VaultWriter interface expected by handlers.
+type Writer struct {
+	vaultPath string
+}
+
+// NewWriter creates a new Writer for the given vault path.
+func NewWriter(vaultPath string) *Writer {
+	return &Writer{vaultPath: vaultPath}
+}
+
+// WriteSession implements handlers.VaultWriter by injecting the vault path into the session.
+func (w *Writer) WriteSession(s Session) (string, error) {
+	s.VaultPath = w.vaultPath
+	return writeSession(s)
+}
+
+// writeSession writes a session's recipes to an Obsidian-compatible markdown file.
 // File path format: {VaultPath}/Recipes/Recipes - {slug} - {date}.md
 // Returns the absolute file path written.
-func WriteSession(s Session) (string, error) {
+func writeSession(s Session) (string, error) {
 	// Create Recipes directory
 	recipesDir := filepath.Join(s.VaultPath, "Recipes")
 	if err := os.MkdirAll(recipesDir, 0o755); err != nil {

@@ -152,7 +152,7 @@ func TestWriteSession(t *testing.T) {
 	}
 
 	// Write session
-	filePath, err := WriteSession(session)
+	filePath, err := writeSession(session)
 	if err != nil {
 		t.Fatalf("WriteSession() returned error: %v", err)
 	}
