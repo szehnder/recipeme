@@ -9,24 +9,7 @@ import (
 	"time"
 
 	"github.com/szehnder/recipeme/internal/handlers"
-	"github.com/szehnder/recipeme/internal/spoonacular"
-	"github.com/szehnder/recipeme/internal/vault"
 )
-
-// LLMProvider abstracts the AI backend used for prompt interpretation.
-type LLMProvider interface {
-	ProcessPrompt(ctx context.Context, prompt string) ([]string, error)
-}
-
-// SpoonacularClient abstracts the recipe search client.
-type SpoonacularClient interface {
-	FanOut(ctx context.Context, terms []string, page, target int, seen map[int]bool) ([]spoonacular.Recipe, error)
-}
-
-// VaultWriter abstracts writing recipe sessions to disk.
-type VaultWriter interface {
-	WriteSession(s vault.Session) (filePath string, err error)
-}
 
 // Server wraps the standard HTTP server with graceful shutdown support.
 type Server struct {
@@ -38,9 +21,9 @@ type Server struct {
 // staticFS is the embedded filesystem for serving the UI (may be nil).
 // shutdown is closed by the save handler to trigger graceful shutdown.
 func New(
-	ai LLMProvider,
-	sp SpoonacularClient,
-	v VaultWriter,
+	ai handlers.LLMProvider,
+	sp handlers.SpoonacularClient,
+	v handlers.VaultWriter,
 	vaultPath string,
 	port int,
 	staticFS fs.FS,
@@ -65,9 +48,9 @@ func New(
 	}
 
 	// API routes.
-	mux.Handle("/api/recipes", handlers.RecipesHandler(ai, sp))
-	mux.Handle("/api/recipes/more", handlers.MoreHandler(sp))
-	mux.Handle("/api/save", handlers.SaveHandler(v, vaultPath, shutdown))
+	mux.HandleFunc("GET /api/recipes", handlers.RecipesHandler(ai, sp))
+	mux.HandleFunc("POST /api/recipes/more", handlers.MoreHandler(sp))
+	mux.HandleFunc("POST /api/save", handlers.SaveHandler(v, vaultPath, shutdown))
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),

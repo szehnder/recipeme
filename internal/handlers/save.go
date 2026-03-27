@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/szehnder/recipeme/internal/spoonacular"
@@ -47,6 +47,7 @@ func toVaultRecipe(r spoonacular.Recipe) vault.Recipe {
 // SaveHandler handles POST /api/save.
 // It writes the saved recipes to the vault and schedules a graceful shutdown.
 func SaveHandler(v VaultWriter, vaultPath string, shutdown chan struct{}) http.HandlerFunc {
+	var once sync.Once
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req saveRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -81,18 +82,7 @@ func SaveHandler(v VaultWriter, vaultPath string, shutdown chan struct{}) http.H
 		// The 1500ms delay ensures the HTTP response is fully sent before shutdown.
 		go func() {
 			time.Sleep(1500 * time.Millisecond)
-			// Guard against double-close using a context.
-			ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-			defer cancel()
-			select {
-			case <-shutdown:
-				// Already closed — nothing to do.
-			case <-ctx.Done():
-				// Timed out waiting — close anyway.
-				close(shutdown)
-			default:
-				close(shutdown)
-			}
+			once.Do(func() { close(shutdown) })
 		}()
 	}
 }
