@@ -11,6 +11,9 @@ import (
 	"unicode"
 )
 
+// htmlTagRe is compiled once at package level for efficient reuse
+var htmlTagRe = regexp.MustCompile("<[^>]+>")
+
 // Recipe represents a recipe with all relevant details.
 type Recipe struct {
 	ID               int
@@ -34,7 +37,8 @@ type Session struct {
 }
 
 // generateSlug creates a slug from the first 5 words of the prompt.
-// Spaces are replaced with hyphens, non-alphanumeric characters (except hyphens) are stripped.
+// Spaces are replaced with hyphens, non-alphanumeric characters (except hyphens) are stripped,
+// and consecutive hyphens are collapsed to a single hyphen.
 func generateSlug(prompt string) string {
 	words := strings.Fields(prompt)
 	if len(words) > 5 {
@@ -51,16 +55,21 @@ func generateSlug(prompt string) string {
 		}
 	}
 
-	return result.String()
+	// Collapse consecutive hyphens to a single hyphen
+	slug = result.String()
+	for strings.Contains(slug, "--") {
+		slug = strings.ReplaceAll(slug, "--", "-")
+	}
+
+	return slug
 }
 
 // stripHTML removes HTML tags from a string.
 func stripHTML(html string) string {
-	re := regexp.MustCompile("<[^>]+>")
-	return re.ReplaceAllString(html, "")
+	return htmlTagRe.ReplaceAllString(html, "")
 }
 
-// truncateSummary truncates summary to ~300 chars at a word boundary.
+// truncateSummary truncates summary to ~300 chars at a word boundary and appends "..." if truncated.
 func truncateSummary(summary string, maxLen int) string {
 	if len(summary) <= maxLen {
 		return summary
@@ -75,7 +84,7 @@ func truncateSummary(summary string, maxLen int) string {
 		truncated = truncated[:lastSpace]
 	}
 
-	return truncated
+	return truncated + "..."
 }
 
 // WriteSession writes a session's recipes to an Obsidian-compatible markdown file.

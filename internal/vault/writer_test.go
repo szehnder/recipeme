@@ -27,7 +27,7 @@ func TestGenerateSlug(t *testing.T) {
 		{
 			name:     "with special chars",
 			prompt:   "quick! easy & tasty recipes?",
-			expected: "quick-easy--tasty-recipes",
+			expected: "quick-easy-tasty-recipes",
 		},
 		{
 			name:     "uppercase",
@@ -107,13 +107,13 @@ func TestTruncateSummary(t *testing.T) {
 			name:     "needs truncation",
 			summary:  "This is a longer text that needs to be truncated",
 			maxLen:   10,
-			expected: "This is a",
+			expected: "This is a...",
 		},
 		{
 			name:     "truncate at word boundary",
 			summary:  "This is a test summary that should be truncated properly at word boundaries",
 			maxLen:   20,
-			expected: "This is a test",
+			expected: "This is a test...",
 		},
 	}
 
