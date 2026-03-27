@@ -9,16 +9,6 @@ import (
 	"testing"
 )
 
-// newTestClient creates a Client whose httpClient points at the given test server URL.
-func newTestClient(serverURL string) *Client {
-	c := NewClient("test-api-key")
-	c.httpClient = &http.Client{}
-	// We'll override the base URL in tests by using a custom transport that rewrites the host.
-	// Simpler approach: just swap the http.Client transport.
-	_ = serverURL
-	return c
-}
-
 // makeServer creates an httptest.Server that serves the provided JSON body with the given status code.
 func makeServer(t *testing.T, status int, body interface{}) *httptest.Server {
 	t.Helper()
