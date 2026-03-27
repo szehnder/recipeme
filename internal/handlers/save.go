@@ -46,7 +46,7 @@ func toVaultRecipe(r spoonacular.Recipe) vault.Recipe {
 
 // SaveHandler handles POST /api/save.
 // It writes the saved recipes to the vault and schedules a graceful shutdown.
-func SaveHandler(v VaultWriter, vaultPath string, shutdown chan struct{}) http.HandlerFunc {
+func SaveHandler(v VaultWriter, shutdown chan struct{}) http.HandlerFunc {
 	var once sync.Once
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req saveRequest
@@ -64,7 +64,6 @@ func SaveHandler(v VaultWriter, vaultPath string, shutdown chan struct{}) http.H
 			Prompt:      req.Prompt,
 			SearchTerms: req.SearchTerms,
 			Recipes:     vaultRecipes,
-			VaultPath:   vaultPath,
 		}
 
 		filePath, err := v.WriteSession(session)

@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"net"
 	"net/http"
-	"time"
 
 	"github.com/szehnder/recipeme/internal/handlers"
 )
@@ -24,7 +23,6 @@ func New(
 	ai handlers.LLMProvider,
 	sp handlers.SpoonacularClient,
 	v handlers.VaultWriter,
-	vaultPath string,
 	port int,
 	staticFS fs.FS,
 	shutdown chan struct{},
@@ -50,7 +48,7 @@ func New(
 	// API routes.
 	mux.HandleFunc("GET /api/recipes", handlers.RecipesHandler(ai, sp))
 	mux.HandleFunc("POST /api/recipes/more", handlers.MoreHandler(sp))
-	mux.HandleFunc("POST /api/save", handlers.SaveHandler(v, vaultPath, shutdown))
+	mux.HandleFunc("POST /api/save", handlers.SaveHandler(v, shutdown))
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
@@ -82,9 +80,7 @@ func (s *Server) Start() (int, error) {
 	return port, nil
 }
 
-// Shutdown gracefully drains in-flight requests with a 5-second timeout.
+// Shutdown gracefully drains in-flight requests using the caller-provided context.
 func (s *Server) Shutdown(ctx context.Context) error {
-	shutdownCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	return s.httpServer.Shutdown(shutdownCtx)
+	return s.httpServer.Shutdown(ctx)
 }

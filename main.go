@@ -42,7 +42,7 @@ func main() {
 
 	shutdown := make(chan struct{})
 
-	srv := server.New(llm, sp, vaultWriter, cfg.VaultPath, cfg.Port, web.FS(), shutdown)
+	srv := server.New(llm, sp, vaultWriter, cfg.Port, web.FS(), shutdown)
 
 	port, err := srv.Start()
 	if err != nil {
@@ -77,5 +77,4 @@ func main() {
 	if err := srv.Shutdown(shutCtx); err != nil {
 		fmt.Fprintf(os.Stderr, "recipeme: shutdown error: %v\n", err)
 	}
-	os.Exit(0)
 }

@@ -12,4 +12,4 @@ services:
       - RECIPEME_NO_BROWSER=1
       - RECIPEME_PORT=8080
     volumes:
-      - ${RECIPEME_VAULT_PATH:-/home/szehnder/Documents/Personal}:/vault:rw
+      - ${RECIPEME_VAULT_PATH}:/vault:rw

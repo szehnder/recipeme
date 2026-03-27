@@ -179,7 +179,7 @@ func TestMoreHandler_Success_ReturnsJSON(t *testing.T) {
 
 func TestSaveHandler_TriggersShutdown(t *testing.T) {
 	shutdown := make(chan struct{})
-	h := handlers.SaveHandler(&stubVault{path: "/tmp/test.md"}, "/tmp/vault", shutdown)
+	h := handlers.SaveHandler(&stubVault{path: "/tmp/test.md"}, shutdown)
 
 	body, _ := json.Marshal(map[string]any{
 		"prompt":      "pasta",
@@ -206,7 +206,7 @@ func TestSaveHandler_TriggersShutdown(t *testing.T) {
 
 func TestSaveHandler_VaultError_Returns500(t *testing.T) {
 	shutdown := make(chan struct{})
-	h := handlers.SaveHandler(&stubVault{err: context.DeadlineExceeded}, "/tmp/vault", shutdown)
+	h := handlers.SaveHandler(&stubVault{err: context.DeadlineExceeded}, shutdown)
 
 	body, _ := json.Marshal(map[string]any{
 		"prompt":      "pasta",
@@ -225,7 +225,7 @@ func TestSaveHandler_VaultError_Returns500(t *testing.T) {
 
 func TestSaveHandler_BadJSON_Returns400(t *testing.T) {
 	shutdown := make(chan struct{})
-	h := handlers.SaveHandler(&stubVault{path: "/tmp/test.md"}, "/tmp/vault", shutdown)
+	h := handlers.SaveHandler(&stubVault{path: "/tmp/test.md"}, shutdown)
 
 	req := httptest.NewRequest(http.MethodPost, "/api/save", strings.NewReader("{bad json}"))
 	rec := httptest.NewRecorder()
@@ -239,7 +239,7 @@ func TestSaveHandler_BadJSON_Returns400(t *testing.T) {
 
 func TestSaveHandler_ReturnsFilePathAndCount(t *testing.T) {
 	shutdown := make(chan struct{})
-	h := handlers.SaveHandler(&stubVault{path: "/vault/Recipes/test.md"}, "/vault", shutdown)
+	h := handlers.SaveHandler(&stubVault{path: "/vault/Recipes/test.md"}, shutdown)
 
 	body, _ := json.Marshal(map[string]any{
 		"prompt":      "quick meals",
