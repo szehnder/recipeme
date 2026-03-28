@@ -216,6 +216,9 @@ async function loadMore() {
 async function saveRecipes() {
   if (state.saved.size === 0) return;
 
+  const saveBtn = document.getElementById("save-btn");
+  saveBtn.disabled = true;
+
   try {
     const resp = await fetch("/api/save", {
       method: "POST",
@@ -229,14 +232,36 @@ async function saveRecipes() {
 
     if (!resp.ok) {
       console.error("save failed:", resp.status);
+      saveBtn.disabled = false;
       return;
     }
 
     const data = await resp.json();
+    saveBtn.textContent = "Saved";
     showSuccessOverlay(data.filePath, state.savedRecipes);
   } catch (err) {
     console.error("save error:", err);
+    showSaveError();
+    saveBtn.disabled = false;
   }
+}
+
+function showSaveError() {
+  const overlay = document.getElementById("success-overlay");
+  const pathEl = document.getElementById("success-path");
+  const listEl = document.getElementById("success-list");
+  const titleEl = document.getElementById("success-title");
+
+  titleEl.textContent = "Save failed";
+  pathEl.textContent = "The server is no longer running. Please restart recipeme and try again.";
+  listEl.innerHTML = "";
+  overlay.classList.remove("hidden");
+
+  overlay.addEventListener('click', () => {
+    overlay.classList.add('hidden');
+    titleEl.textContent = "Saved!";
+    pathEl.textContent = "";
+  }, { once: true });
 }
 
 function showSuccessOverlay(filePath, recipes) {
