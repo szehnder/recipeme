@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -15,7 +16,7 @@ type Config struct {
 	AnthropicKey   string // env: ANTHROPIC_API_KEY (optional)
 	GeminiKey      string // env: GEMINI_API_KEY (optional)
 	LLMProvider    string // env: RECIPEME_LLM_PROVIDER, values: "anthropic"|"gemini", default: auto-detect
-	VaultPath      string // env: RECIPEME_VAULT_PATH, flag: --vault, default: /home/szehnder/Documents/Personal
+	VaultPath      string // env: RECIPEME_VAULT_PATH, flag: --vault, default: ~/recipeme
 	NoBrowser      bool   // env: RECIPEME_NO_BROWSER=1, flag: --no-browser
 	Port           int    // env: RECIPEME_PORT, flag: --port, default: 0 (random)
 }
@@ -24,9 +25,13 @@ type Config struct {
 // Positional arguments are joined to form the Prompt.
 // Returns an error if required fields are missing.
 func LoadConfig() (*Config, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		home = "."
+	}
 	cfg := &Config{
-		VaultPath: "/home/szehnder/Documents/Personal", // default
-		Port:      0,                                   // default (random)
+		VaultPath: filepath.Join(home, "recipeme"),
+		Port:      0,
 	}
 
 	// Define flags
