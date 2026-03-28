@@ -13,6 +13,7 @@ jobs:
     name: Build ${{ matrix.goos }}/${{ matrix.goarch }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: true
       matrix:
         include:
           - goos: linux
@@ -63,6 +64,9 @@ jobs:
         with:
           path: artifacts
           merge-multiple: true
+
+      - name: Generate checksums
+        run: sha256sum artifacts/* > artifacts/checksums.txt
 
       - name: Create release and upload binaries
         uses: softprops/action-gh-release@v2
