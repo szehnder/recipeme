@@ -42,12 +42,23 @@ chmod +x recipeme-macos-arm64
 mv recipeme-macos-arm64 /usr/local/bin/recipeme
 ```
 
+> **macOS users:** macOS may block the binary because it is not signed by Apple. If you see a "cannot be opened" warning, run:
+> ```bash
+> xattr -d com.apple.quarantine /usr/local/bin/recipeme
+> ```
+
 ### Build from source
 
-Requires Go 1.24+.
+Requires [Go 1.24+](https://go.dev/dl/).
 
 ```bash
 go install github.com/szehnder/recipeme@latest
+```
+
+The binary is installed to `~/go/bin/`. Make sure that directory is in your `$PATH`:
+
+```bash
+export PATH="$PATH:$HOME/go/bin"
 ```
 
 ---
@@ -134,7 +145,7 @@ RecipeMe opens a browser window with matching recipes. Use the arrow buttons on 
 | `SPOONACULAR_API_KEY` | — | — | Spoonacular API key (required) |
 | `RECIPEME_VAULT_PATH` | `--vault` | `~/recipeme` | Folder where markdown files are saved |
 | `RECIPEME_PORT` | `--port` | random | Port for the local web server |
-| `RECIPEME_NO_BROWSER` | `--no-browser` | false | Don't auto-open the browser |
+| `RECIPEME_NO_BROWSER` | `--no-browser` | — | Set to `1` to disable auto-open (`RECIPEME_NO_BROWSER=1`) |
 
 ---
 
